@@ -1,0 +1,32 @@
+#!/bin/bash
+
+# Function to fetch all branches from the remote repository
+fetch_all_branches() {
+  git fetch --all --prune
+}
+
+# Function to delete local branches that do not exist in the remote
+delete_stale_local_branches() {
+  local branches=()
+
+  # Get a list of all remote branches
+  while IFS= read -r branch; do
+    branches+=( "$(basename "$branch")" )
+  done < <(git ls-remote --heads origin | cut -f 2)
+
+  # Get a list of all local branches
+  local local_branches=($(git for-each-ref --format="%(refname:short)" refs/heads/))
+
+  # Iterate through local branches and check if they exist in the remote
+  for local_branch in "${local_branches[@]}"; do
+    if [[ ! " ${branches[@]} " =~ " ${local_branch} " ]]; then
+      # Delete the local branch that doesn't exist in the remote
+      git branch -d "$local_branch"
+      echo "Deleted local branch: $local_branch"
+    fi
+  done
+}
+
+# Main script
+fetch_all_branches
+delete_stale_local_branches
