@@ -1,0 +1,36 @@
+alias dockerps='docker ps --format "table {{.Names}}\t{{.ID}}\t{{.Status}}" | (read -r; printf "%s\n" "$REPLY"; sort -k 1 )'
+dockerlogs() {
+    local container_name="$1"
+    local tail_number="${2:-30}"
+    local container_id=$(docker ps -q -f "name=^/$container_name$")
+
+    if [ -z "$container_id" ]; then
+        echo "Container '$container_name' not found."
+        return 1
+    fi
+
+    docker logs "$container_id" -f --tail "$tail_number"
+}
+dockerbash() {
+    local container_name="$1"
+    local container_id=$(docker ps -q -f "name=^/$container_name$")
+
+    if [ -z "$container_id" ]; then
+        echo "Container '$container_name' not found."
+        return 1
+    fi
+
+    docker exec -it "$container_id" sh
+}
+_dockerlogs() {
+    local -a containers
+    containers=($(docker ps --format '{{.Names}}'))
+    _describe 'containers' containers
+}
+_dockerbash() {
+    local -a containers
+    containers=($(docker ps --format '{{.Names}}'))
+    _describe 'containers' containers
+}
+compdef _dockerbash dockerbash
+compdef _dockerlogs dockerlogs
