@@ -1,0 +1,9 @@
+DISABLE_AUTO_TITLE="true"
+TITLE_PRE="\033]0;"
+TITLE_POST="\007"
+window_title="$TITLE_PRE$(hostname)$TITLE_POST"
+echo -ne "$window_title"
+function chpwd() {
+  window_title="$TITLE_PRE$(hostname)$TITLE_POST"
+  echo -ne "$window_title"
+}
