@@ -20,7 +20,7 @@ dockerbash() {
         return 1
     fi
 
-    docker exec -it "$container_id" sh
+    docker exec -it "$container_id" bash
 }
 _dockerlogs() {
     local -a containers
